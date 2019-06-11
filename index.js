@@ -1,34 +1,26 @@
 'use strict';
 
-const apiKey = 'a95ab3b1d71640f3bad20e5618cff44a';
-const searchURL = 'https://newsapi.org/v2/everything';
+const apiKey = 'BO1jzGlnrEZJpPdc0gBIFfwF6rYAtLVV5mkMFsF4'; // updated to NPS api key
+const searchURL = 'https://developer.nps.gov/api/v1/parks';
 
-/**
- * Creates a query string from a params object
- * @param {object} params 
- * @returns {string} query string
- */
+
 function formatQueryParams(params) {
   const queryItems = Object.keys(params)
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
   return queryItems.join('&');
 }
 
-/**
- * Performs the fetch call to get news
- * @param {string} query 
- * @param {number} maxResults 
- */
-function getNews(query, maxResults=10) {
+function getParks(stateAbr, maxResults=10) {
   const params = {
-    q: query,
-    language: 'en',
+    stateCode: stateAbr,
+    limit: maxResults,
   };
-  const queryString = formatQueryParams(params);
-  const url = searchURL + '?' + queryString;
 
+  const queryString = formatQueryParams(params);
+  const url = searchURL + '?' + queryString + '&api_key=' + apiKey;
+  console.log(url);
   const options = {
-    headers: new Headers({'X-Api-Key': apiKey})
+    //headers: new Headers({'X-Api-Key': apiKey})
   };
 
   fetch(url, options)
@@ -44,47 +36,40 @@ function getNews(query, maxResults=10) {
     });
 }
 
-/**
- * Appends formatted HTML results to the page
- * @param {object} responseJson 
- * @param {number} maxResults 
- */ 
+
 function displayResults(responseJson, maxResults) {
   console.log('responseJson: ',responseJson);
-  // clear the error message
   $('#js-error-message').empty();
-  // if there are previous results, remove them
   $('#results-list').empty();
-  // iterate through the articles array, stopping at the max number of results
-  responseJson.articles.forEach(article => {
-    // For each object in the articles array:
-    // Add a list item to the results list with 
-    // the article title, source, author,
-    // description, and image
+
+  for (let i = 0; i < maxResults; i++) {
     $('#results-list').append(
-      `
-        <li><h3><a href="${article.url}">${article.title}</a></h3>
-        <p>${article.source.name}</p>
-        <p>By ${article.author}</p>
-        <p>${article.description}</p>
-        <img src='${article.urlToImage}'>
-        </li>
-      `
-    );
-  });
-  // unhide the results section  
+
+      
+  }
+  //responseJson.data. {
+  //   $('#results-list').append(
+  //     `
+  //       <li><h3><a href="${article.url}">${article.title}</a></h3>
+  //       <p>${article.source.name}</p>
+  //       <p>By ${article.author}</p>
+  //       <p>${article.description}</p>
+  //       <img src='${article.urlToImage}'>
+  //       </li>
+  //     `
+  //   );
+  // });
+
+
   $('#results').removeClass('hidden');
 }
 
-/**
- * Handles the form submission
- */
 function watchForm() {
   $('form').submit(event => {
     event.preventDefault();
     const searchTerm = $('#js-search-term').val();
     const maxResults = $('#js-max-results').val();
-    getNews(searchTerm, maxResults);
+    getParks(searchTerm, maxResults);
   });
 }
 
